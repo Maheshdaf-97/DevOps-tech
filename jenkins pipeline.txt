@@ -1,0 +1,64 @@
+pipeline {
+    agent {
+        label 'slave'
+    }
+    stages {
+        stage('pull repo') {
+            steps {
+                git credentialsId: '12ac5948-1e39-45aa-a85e-32dbf4e8ecfc', url: 'https://github.com/Maheshdaf/onlinebookstore.git'
+            }
+        }
+        stage('Build artifacts') {
+            steps {
+                sh 'sudo yum update -y'
+                sh 'sudo yum install maven -y'
+                sh 'mvn clean package'
+            }
+        }
+        stage('push artifacts to S3') {
+            steps {
+               withAWS(credentials: '90483420-458b-4017-8bd9-129ffcf958cd', region: 'us-west-2') {
+                   sh 'sudo yum update -y'
+                   sh 'sudo yum install awscli -y'
+                   sh 'aws --version'
+                   sh 'aws s3 ls'
+                   sh 'aws s3 mb s3://mynew-jenkins-bucket11 --region us-west-2'
+                   sh 'sudo mv /home/ec2-user/workspace/slave/target/onlinebookstore.war /mnt/onlinebookstore-0.0.1-SNAPSHOT.war'
+                   sh 'aws s3 cp /mnt/onlinebookstore-0.0.1-SNAPSHOT.war s3://mynew-jenkins-bucket11/'
+                   sh 'aws s3api put-object-acl --bucket mynew-jenkins-bucket11 --key onlinebookstore-0.0.1-SNAPSHOT.war --acl public-read'
+                }
+            }
+        }
+        stage("Dev-Deployment"){
+            steps{
+                withCredentials([sshUserPrivateKey(credentialsId: '12ac5948-1e39-45aa-a85e-32dbf4e8ecfc', keyFileVariable: '')]) {
+                  
+                 sh'''
+                  sudo yum update -y
+                  sudo yum install awscli -y 
+                  aws --version
+                  aws configure set aws_access_key_id  
+                  aws configure set aws_secret_access_key  
+                  aws s3 ls
+                  aws s3 cp s3://mynew-jenkins-bucket11/onlinebookstore-0.0.1-SNAPSHOT.war .
+                  sudo curl -O https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.71/bin/apache-tomcat-9.0.71.tar.gz
+                  sudo tar -xvf apache-tomcat-9.0.71.tar.gz -C /opt/
+                  sudo sh /opt/apache-tomcat-9.0.71/bin/shutdown.sh
+                  sudo cp -rv onlinebookstore-0.0.1-SNAPSHOT.war bookstore.war
+                  sudo cp -rv bookstore.war /opt/apache-tomcat-9.0.71/webapps/
+                  sudo sh /opt/apache-tomcat-9.0.71/bin/startup.sh
+                  '''
+                 
+                }
+            } 
+        }
+    }
+}
+
+
+: TO SEE RESULT TYPE {PUBLIC IP:8080/bookstore.war} on chrome. 
+
+1. git {is use to pull}   paste https url of fork onlinebookstore & git should be installed in instance.
+2. maven {is use to build}
+3. aws setting for nested block{push artifact to s3} = aws credentials - aws access key and secret key
+4. bind credentials to variable{devdeployment} = ssh user private key
