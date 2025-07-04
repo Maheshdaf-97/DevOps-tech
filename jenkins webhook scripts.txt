@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    stages {
+        stage('pull repo') {
+            steps {
+                git 'https://github.com/Maheshdaf/onlinebookstore.git'
+            }
+        }
+        stage('Build artifacts') {
+            steps {
+                sh 'sudo yum update -y'
+                sh 'sudo yum install maven -y'
+                sh 'mvn clean package'
+            }
+        }
+        stage('Release artifacts') {
+            steps {
+                deploy adapters: [tomcat9(credentialsId: 'tom', path: '', url: 'http://18.196.137.226:8080/')], contextPath: '/', war: '**/*.war'
+            }
+        }
+    }
+
+}
+
+
+
+for 3rd stage sample steps= deploy to war ear
