@@ -1,5 +1,5 @@
-#!/bin/bash
-sudo yum update -y
-sudo amazon-linux-extras install nginx1 -y
-sudo systemctl start nginx
-sudo systemctl enable nginx
+#!/bin/bash                                       # This is the shebang, tells the system to use Bash shell to run the script.
+sudo yum update -y                                # Updates all installed packages to the latest version (without asking for confirmation).
+sudo amazon-linux-extras install nginx1 -y        # Installs the NGINX web server using Amazon Linux Extras.
+sudo systemctl start nginx                        # Starts the NGINX service
+sudo systemctl enable nginx                       # Enables NGINX to start automatically every time the system boots.
