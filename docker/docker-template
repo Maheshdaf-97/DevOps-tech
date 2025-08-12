@@ -1,0 +1,20 @@
+# Ubuntu image
+FROM ubuntu:latest
+
+# Apache2
+RUN apt-get update && \
+    apt-get install -y apache2 && \
+    apt-get clean
+
+# Copy local HTML and CSS files into the container
+COPY index.html /var/www/html/index.html
+COPY styles.css /var/www/html/styles.css
+
+# Expose port 80 for HTTP traffic
+EXPOSE 80
+
+# Run Apache in the foreground
+CMD ["apachectl", "-D", "FOREGROUND"]
+
+docker build -t dockerfile .
+docker run -d -p 8080:80 dockerfile:latest
