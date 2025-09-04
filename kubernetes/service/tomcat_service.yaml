@@ -7,10 +7,10 @@ metadata:
 spec:
   containers:
   - name: tomcat
-    image: tomcat:9.0    # Official Tomcat image
+    image: tomcat:9.0    
     ports:
-    - containerPort: 8080   # HTTP
-    - containerPort: 8443   # HTTPS
+    - containerPort: 8080   
+    - containerPort: 8443   
 
 ---
 
@@ -22,8 +22,8 @@ metadata:
     app: my-tomcat
 spec:
   selector:
-    app: my-tomcat   # Matches Pod label
-  type: LoadBalancer   # Can also use NodePort if no cloud provider
+    app: my-tomcat   
+  type: LoadBalancer   #can also use NodePort if no cloud provider
   ports:
   - name: http
     port: 8080
