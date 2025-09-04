@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tomcat-pod
+  labels:
+    app: my-tomcat
+spec:
+  containers:
+  - name: tomcat
+    image: tomcat:9.0    # Official Tomcat image
+    ports:
+    - containerPort: 8080   # HTTP
+    - containerPort: 8443   # HTTPS
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+  labels:
+    app: my-tomcat
+spec:
+  selector:
+    app: my-tomcat   # Matches Pod label
+  type: LoadBalancer   # Can also use NodePort if no cloud provider
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: https
+    port: 8443
+    targetPort: 8443
+    protocol: TCP
