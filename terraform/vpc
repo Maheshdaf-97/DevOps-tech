@@ -1,0 +1,62 @@
+# Create VPC
+resource "aws_vpc" "this" {
+  cidr_block       = "10.0.0.0/16"
+  instance_tenancy = "default"
+
+  tags = {
+    Name = "Dev-vpc"
+  }
+}
+
+# Public Subnet 1
+resource "aws_subnet" "public_1" {
+  vpc_id                  = aws_vpc.this.id
+  cidr_block              = "10.0.0.0/20"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "Dev-public-1"
+  }
+}
+
+# Public Subnet 2
+resource "aws_subnet" "public_2" {
+  vpc_id                  = aws_vpc.this.id
+  cidr_block              = "10.0.16.0/20"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "Dev-public-2"
+  }
+}
+
+# Public Subnet 3
+resource "aws_subnet" "public_3" {
+  vpc_id                  = aws_vpc.this.id
+  cidr_block              = "10.0.64.0/20"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "Dev-public-3"
+  }
+}
+
+# Private Subnet 1
+resource "aws_subnet" "private_1" {
+  vpc_id     = aws_vpc.this.id
+  cidr_block = "10.0.32.0/20"
+
+  tags = {
+    Name = "Dev-private-1"
+  }
+}
+
+# Private Subnet 2
+resource "aws_subnet" "private_2" {
+  vpc_id     = aws_vpc.this.id
+  cidr_block = "10.0.48.0/20"
+
+  tags = {
+    Name = "Dev-private-2"
+  }
+}
